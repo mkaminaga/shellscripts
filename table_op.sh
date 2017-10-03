@@ -29,8 +29,8 @@ Usage: ${NAME} [COMMAND] [ARG1] [ARG2]...
     The row in the input file is to be the first raw of the output file 2.
   COMMAND: ${COMMAND_LIST[2]}
     ARG1: The input file.
-    ARG2: The output file.
-    ARG3: The row number to be extracted.
+    ARG2: The row number to be extracted.
+    ARG3: The output file.
     Extracts the specific line from the input file.
     The row is specified.
   COMMAND: ${COMMAND_LIST[3]}
@@ -39,6 +39,7 @@ Usage: ${NAME} [COMMAND] [ARG1] [ARG2]...
 error() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
 }
+#TODO(Mamoru): O(n) algorithm is too slow, consider faster one.
 get_nth_word() {
   local str=${1}
   local wcnt=${2}  # 0 origin
@@ -124,8 +125,27 @@ get_row() {
     exit 1
   fi
   local in=${ARG1}
-  local out=${ARG2}
-  local row=${ARG3}
+  local row=${ARG2}
+  local out=${ARG3}
+  # The row is checked.
+  local row_max=$(echo $(head -n 1 ${in}) | wc -w)
+  if [[ "${row}" -gt "${row_max}" ]]; then
+    error 'row exceeds its range'
+    exit 1
+  fi
+  # Row buffer is created.
+  new_row=()
+  local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
+  for i in $(seq 1 ${col}); do
+    local line=$(sed -n "${i}p" ${in})
+    new_row+=("$(get_nth_word "${line}" ${row})")
+  done
+  # New table is exported.
+  : > ${out}
+  for i in $(seq 1 ${col}); do
+    echo ${new_row[${i}]} >> ${out}
+    echo ${new_row[${i}]}
+  done
 }
 show_help() {
   echo "${HELP}"
@@ -142,6 +162,7 @@ main() {
   else
     error 'Invalid command'
   fi
+  echo 'done.'
 }
 
 main ${1} ${2}

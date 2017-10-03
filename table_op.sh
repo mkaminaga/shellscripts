@@ -22,9 +22,9 @@ Usage: ${NAME} [COMMAND] [ARG1] [ARG2]...
     The outcome is written to the output file.
   COMMAND: ${COMMAND_LIST[1]}
     ARG1: The input file.
-    ARG2: The output file 1.
-    ARG3: The output file 2.
-    ARG4: The row to be the first line of the output file 2.
+    ARG2: The row to be the first line of the output file 2.
+    ARG3: The output file 1.
+    ARG4: The output file 2.
     Divides the table in the input file into the output file 1 and 2.
     The row in the input file is to be the first raw of the output file 2.
   COMMAND: ${COMMAND_LIST[2]}
@@ -39,10 +39,21 @@ Usage: ${NAME} [COMMAND] [ARG1] [ARG2]...
 error() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
 }
+get_nth_word() {
+  local str=${1}
+  local wcnt=${2}  # 0 origin
+  # Pop front until the target word.
+  for i in $(seq 1 ${wcnt}); do
+    str=$(echo ${str} | sed -e 's/\ *[^\ ]*\ *\(.*\)/\1/g')
+  done
+  # The word is acquired.
+  local word=$(echo ${str} | sed -e 's/\([^\ ]*\)\ *.*/\1/g')
+  echo ${word}
+}
 add_table() {
   if [[ ${#} != 3 ]]; then
     error 'argument error.'
-    exit
+    exit 1
   fi
   local in1=${ARG1}
   local in2=${ARG2}
@@ -51,36 +62,66 @@ add_table() {
   local col1=$(echo "$(wc -l ${in1})" | sed -e 's/\(.*\)\ \(.*\)/\1/g')
   local col2=$(echo "$(wc -l ${in2})" | sed -e 's/\(.*\)\ \(.*\)/\1/g')
   if [[ ${col1} != ${col2} ]]; then
-    error 'column num mismatch'
-    exit
+    error 'column number mismatch'
+    exit 1
   fi
-  # New table is created.
-  local new_rows=()
+  # New table buffer is created.
+  local new_col=()  # 1 origin
   for i in $(seq 1 ${col1}); do
     local part1=$(sed -n "${i}p" ${in1})
     local part2=$(sed -n "${i}p" ${in2})
-    new_rows+=("$(echo -e "${part1} ${part2}")")
+    new_col+=("$(echo -e "${part1} ${part2}")")
   done
-  # New table is expoted.
+  # New table is exported.
   : > ${out}
   for i in $(seq 1 ${col1}); do
-    echo ${new_rows[i]} >> ${out}
+    echo ${new_col[${i}]} >> ${out}
   done
 }
 div_table() {
   if [[ ${#} != 4 ]]; then
     error 'argument error.'
-    exit
+    exit 1
   fi
   local in=${ARG1}
-  local out1=${ARG2}
-  local out2=${ARG3}
-  local row=${ARG4}
+  local row=${ARG2}
+  local out1=${ARG3}
+  local out2=${ARG4}
+  # The row is checked.
+  local row_max=$(echo $(head -n 1 ${in}) | wc -w)
+  if [[ "${row}" -gt "${row_max}" ]]; then
+    error 'row exceeds its range'
+    exit 1
+  fi
+  # New table buffers are created.
+  local new_col1=()  # 1 origin
+  local new_col2=()  # 1 origin
+  local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
+  for i in $(seq 1 ${col}); do
+    # Buffers are expanded.
+    new_col1+=('')
+    new_col2+=('')
+    # Lines are divided.
+    local line=$(sed -n "${i}p" ${in})
+    for j in $(seq 0 $((${row} - 1))); do
+      new_col1[${i}]=$(echo ${new_col1[${i}]} $(get_nth_word "${line}" ${j}))
+    done
+    for j in $(seq ${row} $((${row_max} - 1))); do
+      new_col2[${i}]=$(echo ${new_col2[${i}]} $(get_nth_word "${line}" ${j}))
+    done
+  done
+  # New table is exported.
+  : > ${out1}
+  : > ${out2}
+  for i in $(seq 1 ${col}); do
+    echo ${new_col1[${i}]} >> ${out1}
+    echo ${new_col2[${i}]} >> ${out2}
+  done
 }
 get_row() {
   if [[ ${#} != 3 ]]; then
     error 'argument error.'
-    exit
+    exit 1
   fi
   local in=${ARG1}
   local out=${ARG2}

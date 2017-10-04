@@ -140,5 +140,6 @@ main() {
   else
     error 'Invalid command, use -help to see usage'
   fi
+  echo 'done.'
 }
 main ${1} ${2}

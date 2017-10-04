@@ -116,17 +116,13 @@ get_row() {
     error 'row exceeds its range'
     exit 1
   fi
-  # Row buffer is created.
-  new_row=('')
-  local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
-  for i in $(seq 1 ${col}); do
-    local line=$(sed -n "${i}p" ${in})
-    new_row+=("$(get_word "${line}" ${row})")
-  done
   # New table is exported.
   : > ${out}
+  local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
+  local line=''
   for i in $(seq 1 ${col}); do
-    echo ${new_row[${i}]} >> ${out}
+    line=$(sed -n "${i}p" ${in})
+    echo $(get_word "${line}" ${row}) >> ${out}
   done
 }
 show_help() {

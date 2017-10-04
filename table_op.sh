@@ -40,10 +40,10 @@ error() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
 }
 get_nth_word() {
-  local str=${1}
-  local wcnt=${2}
-  # The word is acquired.
-  echo ${str} | grep -o '[^\ ]*' | sed -n "${wcnt}p"
+  # The specified word is acquired.
+  # arg1: Input string.
+  # arg2: Word counter.
+  echo ${1} | grep -o '[^\ ]*' | sed -n "${2}p"
 }
 add_table() {
   if [[ ${#} != 3 ]]; then
@@ -100,11 +100,9 @@ div_table() {
     local line=$(sed -n "${i}p" ${in})
     for j in $(seq 1 $((${row} - 1))); do
       new_col1[${i}]=$(echo ${new_col1[${i}]} $(get_nth_word "${line}" ${j}))
-echo i=${i} j=${j} $(get_nth_word "${line}" ${j})
     done
     for j in $(seq ${row} ${row_max}); do
       new_col2[${i}]=$(echo ${new_col2[${i}]} $(get_nth_word "${line}" ${j}))
-echo i=${i} j=${j} $(get_nth_word "${line}" ${j})
     done
   done
   # New table is exported.
@@ -140,7 +138,6 @@ get_row() {
   : > ${out}
   for i in $(seq 1 ${col}); do
     echo ${new_row[${i}]} >> ${out}
-    echo ${new_row[${i}]}
   done
 }
 show_help() {
@@ -156,9 +153,7 @@ main() {
   elif [[ "${COMMAND}" = "${COMMAND_LIST[3]}" ]]; then
     show_help
   else
-    error 'Invalid command'
+    error 'Invalid command, use -help to see usage'
   fi
-  echo 'done.'
 }
-
 main ${1} ${2}

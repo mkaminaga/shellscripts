@@ -39,17 +39,11 @@ Usage: ${NAME} [COMMAND] [ARG1] [ARG2]...
 error() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
 }
-#TODO(Mamoru): O(n) algorithm is too slow, consider faster one.
 get_nth_word() {
   local str=${1}
-  local wcnt=${2}  # 0 origin
-  # Pop front until the target word.
-  for i in $(seq 1 ${wcnt}); do
-    str=$(echo ${str} | sed -e 's/\ *[^\ ]*\ *\(.*\)/\1/g')
-  done
+  local wcnt=${2}
   # The word is acquired.
-  local word=$(echo ${str} | sed -e 's/\([^\ ]*\)\ *.*/\1/g')
-  echo ${word}
+  echo ${str} | grep -o '[^\ ]*' | sed -n "${wcnt}p"
 }
 add_table() {
   if [[ ${#} != 3 ]]; then
@@ -67,7 +61,7 @@ add_table() {
     exit 1
   fi
   # New table buffer is created.
-  local new_col=()  # 1 origin
+  local new_col=('')
   for i in $(seq 1 ${col1}); do
     local part1=$(sed -n "${i}p" ${in1})
     local part2=$(sed -n "${i}p" ${in2})
@@ -95,8 +89,8 @@ div_table() {
     exit 1
   fi
   # New table buffers are created.
-  local new_col1=()  # 1 origin
-  local new_col2=()  # 1 origin
+  local new_col1=('')
+  local new_col2=('')
   local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
   for i in $(seq 1 ${col}); do
     # Buffers are expanded.
@@ -104,11 +98,13 @@ div_table() {
     new_col2+=('')
     # Lines are divided.
     local line=$(sed -n "${i}p" ${in})
-    for j in $(seq 0 $((${row} - 1))); do
+    for j in $(seq 1 $((${row} - 1))); do
       new_col1[${i}]=$(echo ${new_col1[${i}]} $(get_nth_word "${line}" ${j}))
+echo i=${i} j=${j} $(get_nth_word "${line}" ${j})
     done
-    for j in $(seq ${row} $((${row_max} - 1))); do
+    for j in $(seq ${row} ${row_max}); do
       new_col2[${i}]=$(echo ${new_col2[${i}]} $(get_nth_word "${line}" ${j}))
+echo i=${i} j=${j} $(get_nth_word "${line}" ${j})
     done
   done
   # New table is exported.
@@ -134,7 +130,7 @@ get_row() {
     exit 1
   fi
   # Row buffer is created.
-  new_row=()
+  new_row=('')
   local col=$(echo $(wc -l ${in}) | sed -e 's/\(.*\)\ \(.*\)/\1/g')
   for i in $(seq 1 ${col}); do
     local line=$(sed -n "${i}p" ${in})

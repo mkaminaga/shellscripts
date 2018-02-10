@@ -19,6 +19,7 @@ main() {
   while [[ 1 ]]; do
     if [[ ${missed} -ne 1 ]]; then
       id=$(($RANDOM % 36))
+#     id=$(($RANDOM % 47))  # Full mode
       miss=0
     fi
     c=${list[${id}]}

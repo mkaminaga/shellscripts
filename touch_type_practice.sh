@@ -32,7 +32,7 @@ main() {
       score=$((${score} + 1))
     else
       missed=1
-      echo 'Fail.'
+      echo '*=*=*=*=* Not that! XD *=*=*=*=*'
       echo "score=${score}"
       echo ""
       score=$((${score} - 10))

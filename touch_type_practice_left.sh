@@ -70,7 +70,7 @@ main() {
     fi
     c=${CHAR_LIST[${id}]}
     echo "No.${no}: ${c}"
-    read -s -n1 cin
+    read -n1 cin
     # The asked num is counted
     ASK_CNT[${id}]=$((${ASK_CNT[${id}]} + 1))
     # Judge

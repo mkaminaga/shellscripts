@@ -51,7 +51,7 @@ main() {
     fi
     word=${WORD_LIST[${id}]}
     echo "No.${no}: ${word}"
-    read -s -n${#WORD_LIST[${id}]} word_in
+    read -n${#WORD_LIST[${id}]} word_in
     # The asked num is counted
     ASK_CNT=$((${ASK_CNT} + 1))
     # Judge

@@ -30,7 +30,7 @@ main() {
     word="${CHILD[${id_child}]}${MOTHER[${id_aiueo}]}"
     echo "No.${no}"
     echo ">${word}"
-    read -s -n2 word_in
+    read -n2 word_in
 
     # The asked num is counted
     ASK_CNT[${id_aiueo}]=$((${ASK_CNT[${id_aiueo}]} + 1))

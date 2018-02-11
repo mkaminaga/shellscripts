@@ -63,6 +63,7 @@ main() {
       score=$((${score} + 1))
     else
       missed=1
+      echo ""
       echo '*=*=*=*=* Not that! XD *=*=*=*=*'
       echo "score=${score}"
       echo ""

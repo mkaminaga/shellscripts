@@ -60,6 +60,7 @@ main() {
     # Judge
     if [[ ${word_in} = ${word} ]]; then
       missed=0
+      echo ""
       echo 'Good.'
       echo "score=${score}"
       echo ""

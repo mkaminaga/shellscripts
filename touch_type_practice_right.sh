@@ -86,7 +86,7 @@ main() {
       echo '*=*=*=*=* Not that! XD *=*=*=*=*'
       echo "score=${score}"
       echo ""
-      score=$((${score} - 10))
+      score=$((${score} - 5))
       # The error is counted
       ERR_CNT[${id}]=$((${ERR_CNT[${id}]} + 1))
     fi

@@ -47,7 +47,7 @@ main() {
       echo '*=*=*=*=* Not that! XD *=*=*=*=*'
       echo "score=${score}"
       echo ""
-      score=$((${score} - 10))
+      score=$((${score} - 5))
     fi
     no=$((${no} + 1))
   done

@@ -1,4 +1,7 @@
 ﻿#!/bin/bash
+# 2018/02/11
+# Mamoru Kaminaga
+# Tool for touch type practice.
 
 declare -a CHAR_LIST=( \
   '!' '"' '#' '$' '%' '&' "'" '(' ')' '=' \

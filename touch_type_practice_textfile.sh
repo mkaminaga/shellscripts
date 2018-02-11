@@ -35,7 +35,7 @@ main() {
   echo "open ${text_file}"
   while read -a word || [ "${word}" != "" ]; do
     WORD_LIST+=(${word})
-    echo "loaded ${word}"
+    echo "${word}"
     word_num=$((${word_num} + 1))
   done < ${text_file}
   echo "Total ${word_num} words"

@@ -23,6 +23,8 @@ gnuplotなどのデータファイルを弄る際に用いることを想定。<
 [touch\_type\_practice.sh](touch_type_practice.sh)
 [touch\_type\_practice\_left.sh](touch_type_practice_left.sh)
 [touch\_type\_practice\_right.sh](touch_type_practice_right.sh)
+[touch\_type\_practice\_signiture.sh](touch_type_practice_signiture.sh)
+[touch\_type\_practice\_textfile.sh](touch_type_practice_textfile.sh)
 ----
 タッチタイプの練習用<br>
 あくまで文字の配置を記憶することが目的であるため、単語ではなく文字単体が出現する<br>

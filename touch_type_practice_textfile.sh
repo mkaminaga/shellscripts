@@ -55,6 +55,10 @@ main() {
 
   while [[ 1 ]]; do
     if [[ ${missed} -eq 0 ]]; then
+      if [[ ${#skip_list[@]} -eq ${word_list[@]} ]]; then
+        echo 'All words are excellent! Exit'
+        exit 0
+      fi
       # 1st time success words are skipped.
       id=$(($RANDOM % ${#word_list[@]}))
       while [[ ${skip_list[${id}]} -eq 1 ]]; do

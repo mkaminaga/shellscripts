@@ -23,7 +23,6 @@ main() {
   declare -i missed=0
   declare -i no=0
   declare -i id=0
-  declare -i score=0
   local word=""
   local word_in=""
 
@@ -88,25 +87,33 @@ main() {
         # 1 time clear message.
         echo ""
         echo -e "\e[32m>Excellent.\e[m"
-        echo "score=${score}"
         echo ""
       else
         # normal clear message.
         echo ""
         echo -e "\e[36m>Good.\e[m"
-        echo "score=${score}"
         echo ""
       fi
 
       missed=0
-      score=$((${score} + 1))
     else
       missed=1
       echo ""
       echo -e "\e[31m>Incorrect!\e[m"
-      echo "score=${score}"
+
+      # The difference is shown.
+      for i in $(seq 0 $((${#word} - 1))); do
+        if [[ ${word_in:${i}:1} = ${word:${i}:1} ]]; then
+          # Blue
+          echo -e -n "\e[36m${word_in:${i}:1}\e[m"
+        else
+          # Red
+          echo -e -n "\e[31m${word_in:${i}:1}\e[m"
+        fi
+      done
       echo ""
-      score=$((${score} - 5))
+
+      echo ""
       # The error is counted
       err_cnt=$((${err_cnt} + 1))
     fi

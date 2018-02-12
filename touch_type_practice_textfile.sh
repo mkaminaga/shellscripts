@@ -75,16 +75,24 @@ main() {
     if [[ ${word_in} = ${word} ]]; then
       # 1st time success word is memorized.
       if [[ ${missed} -eq 0 ]]; then
-        sed -e "s/[^#]*${word}/#${word}/g" ${text_file} > ${TMPFILE}
+        sed -e "s/^${word}/#${word}/g" ${text_file} > ${TMPFILE}
         cp ${TMPFILE} ${text_file}
         skip_list[${id}]=1
+
+        # 1 time clear message.
+        echo ""
+        echo -e "\e[32m>Excellent.\e[m"
+        echo "score=${score}"
+        echo ""
+      else
+        # normal clear message.
+        echo ""
+        echo -e "\e[36m>Good.\e[m"
+        echo "score=${score}"
+        echo ""
       fi
 
       missed=0
-      echo ""
-      echo -e "\e[36m>Good.\e[m"
-      echo "score=${score}"
-      echo ""
       score=$((${score} + 1))
     else
       missed=1

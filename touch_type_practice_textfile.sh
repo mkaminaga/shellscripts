@@ -19,6 +19,7 @@ main() {
   declare -a skip_list
   declare -i ask_cnt=0
   declare -i err_cnt=0
+  declare -i skip_num=0
   declare -i missed=0
   declare -i no=0
   declare -i id=0
@@ -55,7 +56,7 @@ main() {
 
   while [[ 1 ]]; do
     if [[ ${missed} -eq 0 ]]; then
-      if [[ ${#skip_list[@]} -eq ${word_list[@]} ]]; then
+      if [[ ${#skip_list[@]} -eq ${skip_num} ]]; then
         echo 'All words are excellent! Exit'
         exit 0
       fi
@@ -82,6 +83,7 @@ main() {
         sed -e "s/^${word}/#${word}/g" ${text_file} > ${TMPFILE}
         cp ${TMPFILE} ${text_file}
         skip_list[${id}]=1
+        skip_num=$((${skip_num} + 1))
 
         # 1 time clear message.
         echo ""

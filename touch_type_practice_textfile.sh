@@ -2,10 +2,6 @@
 # 2018/02/11
 # Mamoru Kaminaga
 # Tool for touch type practice.
-
-declare -a WORD_LIST
-declare -i ASK_CNT=0
-declare -i ERR_CNT=0
 readonly TMPFILE=$(mktemp)
 
 handler() {
@@ -19,12 +15,16 @@ trap handler 0 1 2 3 15
 main() {
   local text_file=${1}
 
+  declare -a word_list
+  declare -a skip_list
+  declare -i ask_cnt=0
+  declare -i err_cnt=0
   declare -i missed=0
   declare -i no=0
   declare -i id=0
   declare -i score=0
-  local word
-  local word_in
+  local word=""
+  local word_in=""
 
   # The specified file is checked.
   if [[ "${text_file}" = "" ]]; then
@@ -37,54 +37,64 @@ main() {
   fi
 
   # The file is loaded.
-  local word_num=0
   echo "open ${text_file}"
   while read -a word || [ "${word}" != "" ]; do
     if [[ "${word:0:1}" != "#" ]]; then
-      WORD_LIST+=(${word})
+      word_list+=(${word})
       echo "${word}"
-      word_num=$((${word_num} + 1))
+      skip_list+=(0)
     fi
   done < ${text_file}
-  echo "Total ${word_num} words"
+  echo "----"
+  echo "Total ${#word_list[@]} words are loaded"
   echo ""
 
+  echo "----"
   echo 'Practice start'
   echo ""
 
   while [[ 1 ]]; do
-    if [[ ${missed} -ne 1 ]]; then
-      id=$(($RANDOM % ${#WORD_LIST[@]}))
+    if [[ ${missed} -eq 0 ]]; then
+      # 1st time success words are skipped.
+      id=$(($RANDOM % ${#word_list[@]}))
+      while [[ ${skip_list[${id}]} -eq 1 ]]; do
+        id=$(($RANDOM % ${#word_list[@]}))
+      done
+
+      # The word is read.
       missed=0
+      word=${word_list[${id}]}
     fi
-    word=${WORD_LIST[${id}]}
     echo "No.${no}: ${word}"
-    read -n${#WORD_LIST[${id}]} word_in
+    read -n${#word_list[${id}]} word_in
+
     # The asked num is counted
-    ASK_CNT=$((${ASK_CNT} + 1))
+    ask_cnt=$((${ask_cnt} + 1))
+
     # Judge
     if [[ ${word_in} = ${word} ]]; then
-      # 1 time success is never asked.
-      if [[ ${missed} -ne 0 ]]; then
+      # 1st time success word is memorized.
+      if [[ ${missed} -eq 0 ]]; then
         sed -e "s/[^#]*${word}/#${word}/g" ${text_file} > ${TMPFILE}
         cp ${TMPFILE} ${text_file}
+        skip_list[${id}]=1
       fi
 
       missed=0
       echo ""
-      echo 'Good.'
+      echo -e "\e[36m>Good.\e[m"
       echo "score=${score}"
       echo ""
       score=$((${score} + 1))
     else
       missed=1
       echo ""
-      echo '*=*=*=*=* Not that! XD *=*=*=*=*'
+      echo -e "\e[31m>Incorrect!\e[m"
       echo "score=${score}"
       echo ""
       score=$((${score} - 5))
       # The error is counted
-      ERR_CNT=$((${ERR_CNT} + 1))
+      err_cnt=$((${err_cnt} + 1))
     fi
     no=$((${no} + 1))
   done

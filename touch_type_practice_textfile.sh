@@ -17,8 +17,6 @@ main() {
 
   declare -a word_list
   declare -a skip_list
-  declare -i ask_cnt=0
-  declare -i err_cnt=0
   declare -i skip_num=0
   declare -i missed=0
   declare -i no=0
@@ -72,9 +70,6 @@ main() {
     echo "No.${no}: ${word}"
     read -n${#word_list[${id}]} word_in
 
-    # The asked num is counted
-    ask_cnt=$((${ask_cnt} + 1))
-
     # Judge
     if [[ ${word_in} = ${word} ]]; then
       # 1st time success word is memorized.
@@ -114,8 +109,6 @@ main() {
       echo ""
 
       echo ""
-      # The error is counted
-      err_cnt=$((${err_cnt} + 1))
     fi
     no=$((${no} + 1))
   done

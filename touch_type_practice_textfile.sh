@@ -6,8 +6,11 @@
 declare -a WORD_LIST
 declare -i ASK_CNT=0
 declare -i ERR_CNT=0
+readonly TMPFILE=$(mktemp)
 
 handler() {
+  rm ${TMPFILE}
+
   # Self terminate
   kill -9 $$
 }
@@ -37,9 +40,11 @@ main() {
   local word_num=0
   echo "open ${text_file}"
   while read -a word || [ "${word}" != "" ]; do
-    WORD_LIST+=(${word})
-    echo "${word}"
-    word_num=$((${word_num} + 1))
+    if [[ "${word:0:1}" != "#" ]]; then
+      WORD_LIST+=(${word})
+      echo "${word}"
+      word_num=$((${word_num} + 1))
+    fi
   done < ${text_file}
   echo "Total ${word_num} words"
   echo ""
@@ -59,6 +64,12 @@ main() {
     ASK_CNT=$((${ASK_CNT} + 1))
     # Judge
     if [[ ${word_in} = ${word} ]]; then
+      # 1 time success is never asked.
+      if [[ ${missed} -ne 0 ]]; then
+        sed -e "s/[^#]*${word}/#${word}/g" ${text_file} > ${TMPFILE}
+        cp ${TMPFILE} ${text_file}
+      fi
+
       missed=0
       echo ""
       echo 'Good.'
